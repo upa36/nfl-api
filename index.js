@@ -1,9 +1,8 @@
-// GET /teams - Return the full list of teams
-// GET /teams/X - Returns the team associated with that ID, where X is a number
-// GET /teams/ABBR - Returns the team associated with that abbreviation
 
 const express = require('express')
+const bodyParser = require('body-parser')
 const teams = require('./teams.json')
+
 
 const app = express()
 
@@ -21,7 +20,18 @@ app.get('/teams/:identifier', (request, response) => {
     } else {
         response.sendStatus(404)
     }
+})
 
+app.post('/teams', bodyParser.json(), (request, response) => {
+    const { id, location, mascot, abbreviation, conference, division } = request.body
+
+    if (!id || !location || !mascot || !abbreviation || !conference || !division) {
+        response.status(400).send('The following attributes are require:id, location, mascot, abbreviation, conference, division')
+    }
+    const newTeam = { id, location, mascot, abbreviation, conference, division }
+
+    teams.push(newTeam)
+    response.status(201).send(newTeam)
 })
 app.all('*', (request, response) => {
     response.sendStatus(404)
